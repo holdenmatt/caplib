@@ -12,8 +12,9 @@ import (
 // In order to quickly compute images of Bits32s, we precompute images for the 4 bytes.
 type CellPerms struct {
 	Perms        [][]int
-	byteImage    [][4][256]Bits32 // Image of each byte in a Bits32, for each perm.
-	zeroPreimage []int            // Preimage of 0 under each perm.
+	byteImage    [][4][256]Bits32  // Image of each byte in a Bits32, for each perm.
+	zeroPreimage []int             // Preimage of 0 under each perm.
+	minImage     map[Bits32]Bits32 // Map each Bits32 to its smallest image.
 }
 
 // NewCellPerms creates a new CellPerms for the given perms.
@@ -45,7 +46,8 @@ func (c Cells) NewCellPerms(perms [][]int) *CellPerms {
 		zeroPreimage = append(zeroPreimage, perm[perm[0]])
 	}
 
-	return &CellPerms{perms, byteImage, zeroPreimage}
+	minImage := make(map[Bits32]Bits32)
+	return &CellPerms{perms, byteImage, zeroPreimage, minImage}
 }
 
 // Apply applies the kth cell perm to a Bits32.
@@ -90,8 +92,16 @@ func (p *CellPerms) MinImageIndex(b Bits32) int {
 
 // MinImage returns the smallest image of a Bits32 under a class of CellPerms.
 func (p *CellPerms) MinImage(b Bits32) Bits32 {
+	image, ok := p.minImage[b]
+	if ok {
+		return image
+	}
+
 	index := p.MinImageIndex(b)
-	return p.Apply(index, b)
+	image = p.Apply(index, b)
+
+	p.minImage[b] = image
+	return image
 }
 
 // MinImages computes the MinImage for each bits in a BitsVec, using an out vector.
