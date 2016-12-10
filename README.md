@@ -6,7 +6,12 @@ affine spaces.
 To keep code organized, this library defines the data structures, while capsearch
 implements the search algorithm using caplib.
 
+
 # Summary
 
-    modn.go - Defines the the ring ℤ/nℤ and its d-dimensional coordinate space.
-    space.go - Defines the vector space (ℤ/3ℤ)^d.
+    modn.go:
+        The ring ℤ/nℤ and its d-dimensional coordinate space.
+
+    space.go:
+        Space - The vector space (ℤ/3ℤ)^d
+        Points - A vector of sorted points in a Space (and ASCII-encoding)
