@@ -26,8 +26,8 @@ type Space struct {
 // Cache a unique Space for each dimension.
 var spaceCache = make(map[int]*Space)
 
-// NewSpace creates a new ternary Space of dimension d.
-func NewSpace(d int) *Space {
+// New creates a new ternary Space of dimension d.
+func New(d int) *Space {
 	if _, ok := spaceCache[d]; !ok {
 		vecs := NewCoordinatesModN(3, d)
 		l := len(vecs.Vecs)

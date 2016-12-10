@@ -4,7 +4,7 @@ import "fmt"
 
 func ExampleSpace_Translations() {
 	for d := 1; d <= 2; d++ {
-		s := NewSpace(d)
+		s := New(d)
 		fmt.Println(s.Translations().Perms)
 	}
 
@@ -15,7 +15,7 @@ func ExampleSpace_Translations() {
 
 func ExampleSpace_CoordPerms() {
 	for d := 1; d <= 3; d++ {
-		s := NewSpace(d)
+		s := New(d)
 		fmt.Println(s.CoordPerms().Perms)
 	}
 
@@ -27,7 +27,7 @@ func ExampleSpace_CoordPerms() {
 
 func ExampleSpace_CoordReflections() {
 	for d := 1; d <= 2; d++ {
-		s := NewSpace(d)
+		s := New(d)
 		fmt.Println(s.CoordReflections().Perms)
 	}
 
@@ -38,7 +38,7 @@ func ExampleSpace_CoordReflections() {
 
 func ExampleSpace_LinearIsoms() {
 	for d := 1; d <= 4; d++ {
-		s := NewSpace(d)
+		s := New(d)
 		isoms := s.LinearIsoms()
 		fmt.Println(isoms.Len())
 		if d < 3 {
@@ -67,9 +67,9 @@ func ExampleSpace_LinearIsoms() {
 }
 
 func ExampleSpace_LinearIsomsModCoords() {
-	fmt.Println(NewSpace(1).LinearIsomsModCoords().Perms)
-	fmt.Println(NewSpace(2).LinearIsomsModCoords().Perms)
-	fmt.Println(len(NewSpace(3).LinearIsomsModCoords().Perms))
+	fmt.Println(New(1).LinearIsomsModCoords().Perms)
+	fmt.Println(New(2).LinearIsomsModCoords().Perms)
+	fmt.Println(len(New(3).LinearIsomsModCoords().Perms))
 
 	// Output:
 	// [[0 1 2]]
@@ -78,13 +78,13 @@ func ExampleSpace_LinearIsomsModCoords() {
 }
 
 func ExampleSpace_LinearIsomsFixingCounts() {
-	fmt.Println(NewSpace(1).LinearIsomsFixingCounts([]int{0, 1, 2}).Perms)
-	fmt.Println(NewSpace(1).LinearIsomsFixingCounts([]int{0, 1, 1}).Perms)
-	fmt.Println(NewSpace(1).LinearIsomsFixingCounts([]int{0, 0, 0}).Perms)
+	fmt.Println(New(1).LinearIsomsFixingCounts([]int{0, 1, 2}).Perms)
+	fmt.Println(New(1).LinearIsomsFixingCounts([]int{0, 1, 1}).Perms)
+	fmt.Println(New(1).LinearIsomsFixingCounts([]int{0, 0, 0}).Perms)
 
-	fmt.Println(NewSpace(2).LinearIsomsFixingCounts([]int{0, 1, 1, 2, 0, 0, 2, 0, 0}).Perms)
-	fmt.Println(NewSpace(2).LinearIsomsFixingCounts([]int{0, 1, 1, 1, 0, 0, 1, 0, 0}).Perms)
-	fmt.Println(NewSpace(2).LinearIsomsFixingCounts([]int{0, 0, 0, 0, 0, 0, 0, 0, 0}).Perms)
+	fmt.Println(New(2).LinearIsomsFixingCounts([]int{0, 1, 1, 2, 0, 0, 2, 0, 0}).Perms)
+	fmt.Println(New(2).LinearIsomsFixingCounts([]int{0, 1, 1, 1, 0, 0, 1, 0, 0}).Perms)
+	fmt.Println(New(2).LinearIsomsFixingCounts([]int{0, 0, 0, 0, 0, 0, 0, 0, 0}).Perms)
 
 	// Output:
 	// [[0 1 2]]

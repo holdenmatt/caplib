@@ -17,19 +17,19 @@ func TestSpaceCache(t *testing.T) {
 	assert := assert.New(t)
 
 	assert.Equal(len(spaceCache), 0)
-	NewSpace(1)
+	New(1)
 	assert.Equal(len(spaceCache), 1)
-	NewSpace(1)
-	NewSpace(1)
+	New(1)
+	New(1)
 	assert.Equal(len(spaceCache), 1)
-	NewSpace(2)
+	New(2)
 	assert.Equal(len(spaceCache), 2)
 }
 
 func TestSpace(t *testing.T) {
 	assert := assert.New(t)
 
-	space := NewSpace(2)
+	space := New(2)
 	assert.Equal(fmt.Sprintf("%v", space), "Space[d = 2]")
 
 	assert.Equal(space.Pts, []int{0, 1, 2, 3, 4, 5, 6, 7, 8})
@@ -56,7 +56,7 @@ func TestSpace(t *testing.T) {
 func TestPoints(t *testing.T) {
 	assert := assert.New(t)
 
-	space := NewSpace(2)
+	space := New(2)
 	pts := NewPoints(space, []int{3, 4, 5, 6, 7, 8})
 	assert.Equal(fmt.Sprintf("%v", pts), "Points[3 4 5 6 7 8]")
 
@@ -69,18 +69,18 @@ func TestPoints(t *testing.T) {
 }
 
 func ExamplePoints_Encode() {
-	space := NewSpace(1)
+	space := New(1)
 	pts := NewPoints(space, []int{})
 	fmt.Println(pts.Encode())
 
 	pts = NewPoints(space, []int{1, 2})
 	fmt.Println(pts.Encode())
 
-	space = NewSpace(2)
+	space = New(2)
 	pts = NewPoints(space, []int{0, 1, 2})
 	fmt.Println(pts.Encode())
 
-	space = NewSpace(3)
+	space = New(3)
 	pts = NewPoints(space, []int{0, 1, 2, 9, 18})
 	fmt.Println(pts.Encode())
 
