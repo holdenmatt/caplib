@@ -138,19 +138,6 @@ func (b Bits32) Inv(cSpace *space.Space) Bits32 {
 	return inv
 }
 
-// IsPreserved returns true iff a (cell) permutation preserves bits.
-func (b Bits32) IsPreserved(perm []int) bool {
-	for i := 0; i < 32; i++ {
-		if b.Test(i) && !b.Test(perm[i]) {
-			// perm maps i outside of bits.
-			return false
-		}
-	}
-
-	// perm maps bits into bits (and is a bijection), hence preserves bits as a set.
-	return true
-}
-
 // Maximum returns the index of the largest set bit, or -1 if empty.
 func (b Bits32) Maximum() int {
 	for i := 31; i >= 0; i-- {
@@ -271,16 +258,6 @@ func (vec BitsVec) GetIndices(indices []int, out BitsVec) {
 	for i, index := range indices {
 		out[i] = vec[index]
 	}
-}
-
-// IsPreserved returns true iff a (cell) permutation preserves all cells in a BitsVec.
-func (vec BitsVec) IsPreserved(perm []int) bool {
-	for _, bits := range vec {
-		if !bits.IsPreserved(perm) {
-			return false
-		}
-	}
-	return true
 }
 
 // PermuteValues permutes cells in a BitsVec, using an out vector.

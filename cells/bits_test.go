@@ -82,22 +82,6 @@ func ExampleBits32_Inv() {
 	// 0
 }
 
-func ExampleBits32_IsPreserved() {
-	bits := NewBits32([]int{1, 2})
-	identity := []int{0, 1, 2, 3, 4, 5, 6, 7, 8}
-	reflection := []int{0, 2, 1, 3, 5, 4, 6, 8, 7}
-	transpose := []int{0, 3, 6, 1, 4, 7, 2, 5, 8}
-
-	fmt.Println(bits.IsPreserved(identity))
-	fmt.Println(bits.IsPreserved(reflection))
-	fmt.Println(bits.IsPreserved(transpose))
-
-	// Output:
-	// true
-	// true
-	// false
-}
-
 func ExampleBits32_Maximum() {
 	fmt.Println(NewBits32([]int{0, 1, 2, 3}).Maximum())
 	fmt.Println(NewBits32([]int{31}).Maximum())
@@ -146,10 +130,6 @@ func ExampleBitsVec() {
 	fmt.Println(out.Cmp(vec))
 	fmt.Println(out.EliminatedInCell(cells, 0))
 
-	reflection := []int{0, 2, 1, 3, 5, 4, 6, 8, 7}
-	fmt.Println(out.IsPreserved(transpose))
-	fmt.Println(out.IsPreserved(reflection))
-
 	cells.Translations.MinImages(vec, out)
 	fmt.Println(out)
 
@@ -166,8 +146,6 @@ func ExampleBitsVec() {
 	// [6 0 0 0 0 0 0 0 0]
 	// -1
 	// 7
-	// false
-	// true
 	// [9 0 0 0 0 0 0 0 0]
 	// [72 1 0 0 0 0 0 0 0]
 	// [72 0 0 1 0 0 0 0 0]
