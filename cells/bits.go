@@ -192,9 +192,14 @@ func (c Cells) Eliminated(a Bits32, b Bits32) Bits32 {
 // one for each cell.
 type BitsVec []Bits32
 
+// NewBitsVec creates a new BitsVec with given length.
+func NewBitsVec(l int) BitsVec {
+	return make([]Bits32, l)
+}
+
 // NewBitsVec creates a new BitsVec for a Cells.
 func (c Cells) NewBitsVec() BitsVec {
-	return make([]Bits32, len(c.Cells))
+	return NewBitsVec(len(c.Cells))
 }
 
 // Hash a BitsVec. This is the modular hashing algorithm used by Java's hashCode(),
@@ -255,6 +260,17 @@ func (vec BitsVec) EliminatedInCell(cells Cells, cell int) Bits32 {
 		}
 	}
 	return bits
+}
+
+// GetIndices computes vec[indices], in an out BitsVec.
+func (vec BitsVec) GetIndices(indices []int, out BitsVec) {
+	if len(indices) != len(out) {
+		panic("length mismatch")
+	}
+
+	for i, index := range indices {
+		out[i] = vec[index]
+	}
 }
 
 // IsPreserved returns true iff a (cell) permutation preserves all cells in a BitsVec.
