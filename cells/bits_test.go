@@ -130,6 +130,9 @@ func ExampleBitsVec() {
 	fmt.Println(out.Cmp(vec))
 	fmt.Println(out.EliminatedInCell(cells, 0))
 
+	vec.CopyTo(out)
+	fmt.Println(out.Cmp(vec))
+
 	cells.Translations.MinImages(vec, out)
 	fmt.Println(out)
 
@@ -146,6 +149,7 @@ func ExampleBitsVec() {
 	// [6 0 0 0 0 0 0 0 0]
 	// -1
 	// 7
+	// 0
 	// [9 0 0 0 0 0 0 0 0]
 	// [72 1 0 0 0 0 0 0 0]
 	// [72 0 0 1 0 0 0 0 0]

@@ -231,6 +231,17 @@ func (vec BitsVec) Cmp(other BitsVec) int {
 	return 0
 }
 
+// CopyTo copies this vec to other.
+func (vec BitsVec) CopyTo(other BitsVec) {
+	if len(vec) != len(other) {
+		panic("length mismatch")
+	}
+
+	for i, val := range vec {
+		other[i] = val
+	}
+}
+
 // EliminatedInCell returns the pts eliminated by a BitsVec in a single cell.
 func (vec BitsVec) EliminatedInCell(cells Cells, cell int) Bits32 {
 	elimByCell := cells.QSpace.Elim[cell]
