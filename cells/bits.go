@@ -249,17 +249,6 @@ func (vec BitsVec) EliminatedInCell(cells Cells, cell int) Bits32 {
 	return bits
 }
 
-// GetIndices computes vec[indices], in an out BitsVec.
-func (vec BitsVec) GetIndices(indices []int, out BitsVec) {
-	if len(indices) != len(out) {
-		panic("length mismatch")
-	}
-
-	for i, index := range indices {
-		out[i] = vec[index]
-	}
-}
-
 // PermuteValues permutes cells in a BitsVec, using an out vector.
 func (vec BitsVec) PermuteValues(qIsom []int, out BitsVec) {
 	if len(vec) != len(out) {
