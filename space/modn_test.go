@@ -50,13 +50,3 @@ func TestCoordinatesModN(t *testing.T) {
 	assert.Equal(c.StdBasis(), []int{1, 3})
 	assert.Equal(c.Directions(), []int{1, 3, 4, 5})
 }
-
-func TestSpan(t *testing.T) {
-	assert := assert.New(t)
-
-	c := NewCoordinatesModN(3, 4)
-	assert.Equal(c.Span([]int{0}), []int{0})
-	assert.Equal(c.Span([]int{1, 2}), []int{0, 1, 2})
-	assert.Equal(c.Span([]int{1, 3}), []int{0, 1, 2, 3, 4, 5, 6, 7, 8})
-	assert.Equal(c.Span([]int{9, 27}), []int{0, 9, 18, 27, 36, 45, 54, 63, 72})
-}

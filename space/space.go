@@ -75,6 +75,35 @@ func (s Space) Size() int {
 	return len(s.Pts)
 }
 
+// Span returns the span of vectors with given indices,
+// in the order of coefficient vectors.
+func (s Space) Span(indices []int) []int {
+	if len(indices) == 0 {
+		return []int{ORIGIN}
+	}
+
+	last := indices[len(indices)-1]
+	head := indices[:len(indices)-1]
+
+	lastInv := s.Inv[last]
+	headSpan := s.Span(head)
+
+	if util.Contains(headSpan, last) {
+		return headSpan
+	}
+
+	// Append headSpan, headSpan + last, headSpan + lastInv
+	span := make([]int, 0, 3*len(headSpan))
+	span = append(span, headSpan...)
+	for _, p := range headSpan {
+		span = append(span, s.Sum[p][last])
+	}
+	for _, p := range headSpan {
+		span = append(span, s.Sum[p][lastInv])
+	}
+	return span
+}
+
 //
 //--- Points ---//
 //
@@ -102,8 +131,9 @@ func (pts Points) PlaneCount(normal int) int {
 	}
 
 	count := 0
+	perp := pts.Space.Perp[normal]
 	for _, p := range pts.Pts {
-		if pts.Space.Perp[p][normal] {
+		if perp[p] {
 			count++
 		}
 	}

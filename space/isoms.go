@@ -128,7 +128,7 @@ func (s *Space) LinearIsomsFixingCounts(counts []int) util.Perms {
 // This allows us to specify a linear isom by its image basis.
 func (s *Space) basisToPerm(basis []int) []int {
 	// ith pt -> ith coeff vector -> ith basis image
-	images := s.Vecs.Span(basis)
+	images := s.Span(basis)
 
 	if len(basis) != s.D {
 		panic("basis must have dimension D")
@@ -148,7 +148,7 @@ func (s *Space) sorted1Bases(partialBasis []int) [][]int {
 	}
 
 	max := util.Maximum(partialBasis)
-	partialSpan := s.Vecs.Span(partialBasis)
+	partialSpan := s.Span(partialBasis)
 
 	var bases [][]int
 	for p := range s.Pts {
@@ -179,7 +179,7 @@ func (s *Space) basesFixingCounts(counts []int, partialBasis []int) [][]int {
 	}
 
 	// The partial map takes stdSpan -> partialSpan.
-	partialSpan := s.Vecs.Span(partialBasis)
+	partialSpan := s.Span(partialBasis)
 	stdSpan := util.Range(len(partialSpan))
 
 	// Find the pts/counts added by including the next StdBases vector.

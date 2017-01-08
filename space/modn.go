@@ -117,32 +117,3 @@ func (c CoordinatesModN) Directions() []int {
 	}
 	return dirs
 }
-
-// Span returns the span of vectors with given indices,
-// in the order of coefficient vectors.
-func (c CoordinatesModN) Span(indices []int) []int {
-	if len(indices) == 0 {
-		return []int{ORIGIN}
-	}
-
-	last := indices[len(indices)-1]
-	head := indices[:len(indices)-1]
-
-	lastInv := c.Inv(last)
-	headSpan := c.Span(head)
-
-	if util.Contains(headSpan, last) {
-		return headSpan
-	}
-
-	// Append headSpan, headSpan + last, headSpan + lastInv
-	span := make([]int, 0, 3*len(headSpan))
-	span = append(span, headSpan...)
-	for _, p := range headSpan {
-		span = append(span, c.Sum(p, last))
-	}
-	for _, p := range headSpan {
-		span = append(span, c.Sum(p, lastInv))
-	}
-	return span
-}
