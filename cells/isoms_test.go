@@ -13,8 +13,16 @@ func ExampleCellPerms_MinImage() {
 	fmt.Println(translations.MinImageIndex(bits))
 	fmt.Println(translations.MinImage(bits))
 
+	bits = NewBits32([]int{0, 4})
+	fmt.Println(bits)
+	fmt.Println(translations.MinImageIndex(bits))
+	fmt.Println(translations.MinImage(bits))
+
 	// Output:
 	// 8
+	// 17
+	// 17
+	// 0
 	// 17
 }
 

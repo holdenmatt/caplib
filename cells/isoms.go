@@ -232,15 +232,19 @@ func (c Cells) QIsomsFixingCounts(counts []int) util.Perms {
 //
 
 // MinShear computes the minimal shear of a BitsVec, in place.
+// Only shear a dimension if its basis value is nonzero (which means this may not
+// be minimal in some cases, so we won't dedup as much as we could).
 func (c Cells) MinShear(vec BitsVec) {
 	basis := c.QSpace.StdBasis
-	lastIndex := c.lastNonemptyBasisIndex(vec)
-
 	for i, basisPt := range basis {
-		if i <= lastIndex {
-			bits := vec[basisPt]
+		bits := vec[basisPt]
+		if bits != 0 {
 			minTIndex := c.Translations.MinImageIndex(bits)
-			c.iShear(vec, minTIndex, i)
+
+			// No need to shear if it's the identity.
+			if minTIndex != 0 {
+				c.iShear(vec, minTIndex, i)
+			}
 		}
 	}
 }
@@ -260,24 +264,4 @@ func (c Cells) iShear(vec BitsVec, transIndex int, i int) {
 			vec[k] = translations.Apply(transIndex, vec[k])
 		}
 	}
-}
-
-// lastNonemptyBasisIndex returns the last std basis index for which the cell is nonempty.
-// We expect (and assert) that if any std basis cell is empty, then all later cells
-// must be empty as well.
-func (c Cells) lastNonemptyBasisIndex(vec BitsVec) int {
-	basis := c.QSpace.StdBasis
-	for i, basisPt := range basis {
-		if vec[basisPt] == 0 {
-			// Check all larger cells are also empty.
-			for k := basisPt + 1; k < len(vec); k++ {
-				if vec[k] != 0 {
-					panic("if a std basis cell is empty, all larger pts must also be empty")
-				}
-			}
-			lastNonempty := i - 1
-			return lastNonempty
-		}
-	}
-	return len(basis) - 1
 }

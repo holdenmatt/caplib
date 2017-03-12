@@ -140,6 +140,12 @@ func (s *Space) basisToPerm(basis []int) []int {
 	return images
 }
 
+// BasisToInvPerm returns the linear map taking a given basis to the std basis.
+func (s *Space) BasisToInvPerm(basis []int) []int {
+	images := s.basisToPerm(basis)
+	return util.InversePerm(images)
+}
+
 // sorted1Bases returns all sorted bases consisting of only vectors with
 // leading 1. This is a single representative for each basis class mod CoordIsoms.
 func (s *Space) sorted1Bases(partialBasis []int) [][]int {
