@@ -104,6 +104,32 @@ func (s Space) Span(indices []int) []int {
 	return span
 }
 
+// LinearCombo computes the linear combination of pts with the given coeffs.
+func (s Space) LinearCombo(pts []int, coeffs []int) int {
+	if len(pts) != len(coeffs) {
+		panic("length mismatch")
+	}
+
+	if len(pts) == 0 {
+		return ORIGIN
+	}
+
+	res := s.LinearCombo(pts[1:], coeffs[1:])
+
+	pt0 := pts[0]
+	c0 := coeffs[0]
+	if c0 == 1 {
+		res = s.Sum[res][pt0]
+	} else if c0 == 2 {
+		res = s.Sum[res][pt0]
+		res = s.Sum[res][pt0]
+	} else if c0 != 0 {
+		panic("coeffs must be 0, 1, or 2")
+	}
+
+	return res
+}
+
 //
 //--- Points ---//
 //

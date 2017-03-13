@@ -63,6 +63,22 @@ func TestSpan(t *testing.T) {
 	assert.Equal(s.Span([]int{9, 27}), []int{0, 9, 18, 27, 36, 45, 54, 63, 72})
 }
 
+func TestLinearCombo(t *testing.T) {
+	assert := assert.New(t)
+
+	s := New(4)
+	assert.Equal(s.LinearCombo([]int{}, []int{}), 0)
+	assert.Equal(s.LinearCombo([]int{4}, []int{0}), 0)
+	assert.Equal(s.LinearCombo([]int{4}, []int{1}), 4)
+	assert.Equal(s.LinearCombo([]int{4}, []int{2}), 8)
+
+	assert.Panics(func() {
+		s.LinearCombo([]int{4}, []int{3})
+	})
+
+	assert.Equal(s.LinearCombo([]int{2, 3}, []int{2, 2}), 7)
+}
+
 func TestPoints(t *testing.T) {
 	assert := assert.New(t)
 
