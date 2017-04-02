@@ -265,3 +265,73 @@ func (c Cells) iShear(vec BitsVec, transIndex int, i int) {
 		}
 	}
 }
+
+// Shearer is used to compute min shears.
+type Shearer struct {
+	cells        Cells
+	nonzeroBasis []int
+	basisSpan    []int
+
+	minTIndex []int
+}
+
+// NewShearer creates a new Shearer.
+func (c Cells) NewShearer() Shearer {
+	basis := c.nonzeroBasis()
+
+	var basisSpan []int
+	for _, qCoeffs := range c.QSpace.Vecs.Vecs {
+		image := c.QSpace.LinearCombo(basis, qCoeffs)
+		basisSpan = append(basisSpan, image)
+	}
+
+	minTIndex := make([]int, c.QSpace.D)
+	return Shearer{c, basis, basisSpan, minTIndex}
+}
+
+// MinShear2 computes the minimal shear of a BitsVec, in place.
+func (s Shearer) MinShear2(vec BitsVec) {
+	c := s.cells
+	basis := s.nonzeroBasis
+
+	// Get min translate indices on this basis.
+	for i, basisPt := range basis {
+		bits := vec[basisPt]
+		s.minTIndex[i] = c.Translations.MinImageIndex(bits)
+	}
+
+	for k, qCoeffs := range c.QSpace.Vecs.Vecs {
+		qPt := s.basisSpan[k]
+		value := vec[qPt]
+
+		for i, tIndex := range s.minTIndex {
+			if qCoeffs[i] == 1 {
+				value = c.Translations.Apply(tIndex, value)
+			} else if qCoeffs[i] == 2 {
+				value = c.Translations.Apply(tIndex, value)
+				value = c.Translations.Apply(tIndex, value)
+			}
+		}
+
+		vec[qPt] = value
+	}
+}
+
+// nonzeroBasis finds the smallest basis for QSpace such that
+// all partition values are nonzero.
+func (c Cells) nonzeroBasis() []int {
+	var basis []int
+	var span []int
+
+	i := 1
+	for len(basis) < c.QSpace.D {
+		for c.Counts[i] == 0 || util.Contains(span, i) {
+			i++
+		}
+
+		basis = append(basis, i)
+		span = c.QSpace.Span(basis)
+	}
+
+	return basis
+}
