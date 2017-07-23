@@ -147,7 +147,7 @@ func NewPoints(s *Space, pts []int) *Points {
 
 // String returns the default string representation of Points.
 func (pts Points) String() string {
-	return fmt.Sprintf("Points%v", pts.Pts)
+	return fmt.Sprintf("Points[%v]", util.Join(pts.Pts, ", "))
 }
 
 // PlaneCount returns the count of pts in the plane orthogonal to a given normal pt.

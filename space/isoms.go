@@ -196,14 +196,16 @@ func (s *Space) basesFixingCounts(counts []int, partialBasis []int) [][]int {
 
 	// Each extension maps nextStdBasisPt -> p; find those that preserve counts.
 	var bases [][]int
+	nextPts := make([]int, len(partialSpan))
+	nextCounts := make([]int, len(partialSpan))
 	for p := range s.Pts {
 		// Only select linearly independent pts.
 		if !util.Contains(partialSpan, p) {
 			// Check p itself preserves the count.
 			if counts[p] == counts[nextStdBasisPt] {
-				// Check all the added pts preverse the count.
-				nextPts := util.GetIndices(s.Sum[p], partialSpan)
-				nextCounts := util.GetIndices(counts, nextPts)
+				// Check all the added pts preserve the count.
+				util.GetIndicesOut(s.Sum[p], partialSpan, nextPts)
+				util.GetIndicesOut(counts, nextPts, nextCounts)
 				if util.Equal(nextCounts, stdCounts) {
 					nextPartialBasis := append(util.Clone(partialBasis), p)
 					nextBases := s.basesFixingCounts(counts, nextPartialBasis)
