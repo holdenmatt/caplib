@@ -6,12 +6,36 @@ import (
 )
 
 // cmp stores precomputed byte comparisons such that cmp[i][j] = Cmp(i, j).
-var cmp [256][256]int
+var _cmp [256][256]int
+
+// inv stores precomputed inverses of each byte in a Bits32.
+var _inv [4][256]Bits32
 
 func init() {
 	for i := 0; i < 255; i++ {
 		for j := 0; j < 255; j++ {
-			cmp[i][j] = byteCmp(byte(i), byte(j))
+			_cmp[i][j] = byteCmp(byte(i), byte(j))
+		}
+	}
+
+	// Invert in 3-space (cells can't be any bigger).
+	cSpace := space.New(3)
+	for pos := 0; pos < 4; pos++ {
+		for j := 0; j < 255; j++ {
+
+			jInv := Bits32(0)
+			for k := 0; k < 8; k++ {
+				// Is the k'th bit of j set?
+				kthSet := (j & (1 << uint(k))) != 0
+				if kthSet {
+					// Invert the index, adjusted for byte position.
+					index := 8*pos + k
+					if index < cSpace.Size() {
+						jInv = jInv.Set(cSpace.Inv[index])
+					}
+				}
+			}
+			_inv[pos][j] = jInv
 		}
 	}
 }
@@ -80,19 +104,19 @@ func (b Bits32) Empty() bool {
 
 // Cmp compares two Bits32s lexicographically as bit vectors.
 func (b Bits32) Cmp(other Bits32) int {
-	c := cmp[byte(b)][byte(other)]
+	c := _cmp[byte(b)][byte(other)]
 	if c != 0 {
 		return c
 	}
-	c = cmp[byte(b>>8)][byte(other>>8)]
+	c = _cmp[byte(b>>8)][byte(other>>8)]
 	if c != 0 {
 		return c
 	}
-	c = cmp[byte(b>>16)][byte(other>>16)]
+	c = _cmp[byte(b>>16)][byte(other>>16)]
 	if c != 0 {
 		return c
 	}
-	c = cmp[byte(b>>24)][byte(other>>24)]
+	c = _cmp[byte(b>>24)][byte(other>>24)]
 	if c != 0 {
 		return c
 	}
@@ -126,8 +150,7 @@ func (b Bits32) Intersection(indices []int) Bits32 {
 	return inter
 }
 
-// Inv inverts bits in a cSpace.
-// TODO: Can we use a table independent of the space?
+// Inv inverts bits in a CSpace.
 func (b Bits32) Inv(cSpace *space.Space) Bits32 {
 	var inv Bits32
 	for i := 0; i < 32; i++ {
@@ -136,6 +159,14 @@ func (b Bits32) Inv(cSpace *space.Space) Bits32 {
 		}
 	}
 	return inv
+}
+
+// InvFast inverts bits in CSpace.
+func (b Bits32) InvFast() Bits32 {
+	return (_inv[0][byte(b)] |
+		_inv[1][byte(b>>8)] |
+		_inv[2][byte(b>>16)] |
+		_inv[3][byte(b>>24)])
 }
 
 // Maximum returns the index of the largest set bit, or -1 if empty.
