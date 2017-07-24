@@ -84,7 +84,7 @@ func TestPoints(t *testing.T) {
 
 	space := New(2)
 	pts := NewPoints(space, []int{3, 4, 5, 6, 7, 8})
-	assert.Equal(fmt.Sprintf("%v", pts), "Points[3 4 5 6 7 8]")
+	assert.Equal(fmt.Sprintf("%v", pts), "Points[3, 4, 5, 6, 7, 8]")
 
 	assert.Equal(pts.PlaneCount(1), 2)
 	assert.Equal(pts.PlaneCount(3), 0)
@@ -116,17 +116,17 @@ func ExamplePoints_Encode() {
 	// -
 	// -
 	//
-	// Points[1 2]
+	// Points[1, 2]
 	// -
 	// #
 	// #
 	//
-	// Points[0 1 2]
+	// Points[0, 1, 2]
 	// # - -
 	// # - -
 	// # - -
 	//
-	// Points[0 1 2 9 18]
+	// Points[0, 1, 2, 9, 18]
 	// # - -
 	// # - -
 	// # - -
