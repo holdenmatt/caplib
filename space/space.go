@@ -2,7 +2,6 @@ package space
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/holdenmatt/util"
@@ -13,11 +12,11 @@ type Space struct {
 	D    int              // Dimension
 	Vecs *CoordinatesModN // The space of coordinate d-vectors
 
-	Pts  []int    // Instead of dealing with vecs, we work with their indices ("points")
-	Inv  []int    // Map each pt p -> -p
-	Sum  [][]int  // Map (p, q) -> p + q
-	Elim [][]int  // Map (p, q) -> the eliminated pt (the one that creates a line)
-	Perp [][]bool // Map (p, q) -> true iff p and q are orthogonal.
+	Pts    []int   // Instead of dealing with vecs, we work with their indices ("points")
+	Inv    []int   // Map each pt p -> -p
+	Sum    [][]int // Map (p, q) -> p + q
+	Elim   [][]int // Map (p, q) -> the eliminated pt (the one that creates a line)
+	Planes *Planes // Planes through the origin.
 
 	StdBasis   []int // Standard basis indices
 	Directions []int // Indices of unique directions
@@ -43,23 +42,22 @@ func New(d int) *Space {
 		// Compute sum/elim/dot.
 		Sum := make([][]int, l)
 		Elim := make([][]int, l)
-		Perp := make([][]bool, l)
 		for i := 0; i < l; i++ {
 			Sum[i] = make([]int, l)
 			Elim[i] = make([]int, l)
-			Perp[i] = make([]bool, l)
 			for j := 0; j < l; j++ {
 				sum := vecs.Sum(i, j)
 				Sum[i][j] = sum
 				Elim[i][j] = vecs.Inv(sum)
-				Perp[i][j] = vecs.Dot(i, j) == 0
 			}
 		}
 
 		StdBasis := vecs.StdBasis()
 		Directions := vecs.Directions()
 
-		spaceCache[d] = &Space{d, vecs, Pts, Inv, Sum, Elim, Perp, StdBasis, Directions}
+		s := &Space{d, vecs, Pts, Inv, Sum, Elim, nil, StdBasis, Directions}
+		s.Planes = NewPlanes(s)
+		spaceCache[d] = s
 	}
 
 	return spaceCache[d]
@@ -148,62 +146,6 @@ func NewPoints(s *Space, pts []int) *Points {
 // String returns the default string representation of Points.
 func (pts Points) String() string {
 	return fmt.Sprintf("Points[%v]", util.Join(pts.Pts, ", "))
-}
-
-// PlaneCount returns the count of pts in the plane orthogonal to a given normal pt.
-func (pts Points) PlaneCount(normal int) int {
-	if normal == ORIGIN {
-		panic("normal must be nonzero")
-	}
-
-	count := 0
-	perp := pts.Space.Perp[normal]
-	for _, p := range pts.Pts {
-		if perp[p] {
-			count++
-		}
-	}
-	return count
-}
-
-// PlaneCounts maps each plane count to the # of planes through the origin
-// with that count.
-//
-// This is invariant under linear isomorphisms, so if two Points have differing
-// PlaneCounts they cannot be isomorphic.
-func (pts Points) PlaneCounts() map[int]int {
-	counts := make(map[int]int)
-	for _, normal := range pts.Space.Directions {
-		count := pts.PlaneCount(normal)
-		if _, exists := counts[count]; exists {
-			counts[count]++
-		} else {
-			counts[count] = 1
-		}
-	}
-	return counts
-}
-
-// PlaneCountsString returns PlaneCounts as a string "[keys] => [values]"
-// sorted by key.
-func (pts Points) PlaneCountsString() string {
-	counts := pts.PlaneCounts()
-
-	// Sort keys.
-	var keys []int
-	for k := range counts {
-		keys = append(keys, k)
-	}
-	sort.Ints(keys)
-
-	// Sort values by key.
-	values := make([]int, 0, len(counts))
-	for _, k := range keys {
-		values = append(values, counts[k])
-	}
-
-	// Print "[keys] => [values]"
-	return fmt.Sprintf("%v => %v", keys, values)
 }
 
 //

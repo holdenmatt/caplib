@@ -16,14 +16,14 @@ func init() {
 func TestSpaceCache(t *testing.T) {
 	assert := assert.New(t)
 
-	assert.Equal(len(spaceCache), 0)
-	New(1)
 	assert.Equal(len(spaceCache), 1)
 	New(1)
-	New(1)
-	assert.Equal(len(spaceCache), 1)
-	New(2)
 	assert.Equal(len(spaceCache), 2)
+	New(1)
+	New(1)
+	assert.Equal(len(spaceCache), 2)
+	New(3)
+	assert.Equal(len(spaceCache), 3)
 }
 
 func TestSpace(t *testing.T) {
@@ -42,10 +42,6 @@ func TestSpace(t *testing.T) {
 	assert.Equal(len(space.Elim), 9)
 	assert.Equal(space.Elim[0], space.Inv)
 	assert.Equal(space.Elim[1], []int{2, 1, 0, 8, 7, 6, 5, 4, 3})
-
-	assert.Equal(space.Perp[0][1], true)
-	assert.Equal(space.Perp[2][2], false)
-	assert.Equal(space.Perp[1][3], true)
 
 	assert.Equal(space.StdBasis, []int{1, 3})
 	assert.Equal(space.Directions, []int{1, 3, 4, 5})
@@ -85,13 +81,6 @@ func TestPoints(t *testing.T) {
 	space := New(2)
 	pts := NewPoints(space, []int{3, 4, 5, 6, 7, 8})
 	assert.Equal(fmt.Sprintf("%v", pts), "Points[3, 4, 5, 6, 7, 8]")
-
-	assert.Equal(pts.PlaneCount(1), 2)
-	assert.Equal(pts.PlaneCount(3), 0)
-	assert.Panics(func() {
-		pts.PlaneCount(0)
-	})
-	assert.Equal(pts.PlaneCountsString(), "[0 2] => [1 3]")
 }
 
 func ExamplePoints_Encode() {
