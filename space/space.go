@@ -2,7 +2,6 @@ package space
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/holdenmatt/util"
 )
@@ -146,82 +145,4 @@ func NewPoints(s *Space, pts []int) *Points {
 // String returns the default string representation of Points.
 func (pts Points) String() string {
 	return fmt.Sprintf("Points[%v]", util.Join(pts.Pts, ", "))
-}
-
-//
-//-- Encode Points as a graphical ASCII string --//
-//
-
-const pointSymbol = "#"
-const emptySymbol = "-"
-
-// Encode some Points as an ASCII string.
-func (pts Points) Encode() string {
-	lines := encodeLines(pts.Space.D, pts.Pts)
-	return fmt.Sprintf("%v\n%v\n", pts, strings.Join(lines, "\n"))
-}
-
-// encodeLines returns a string representation of pts, as a slice of lines.
-// In alternate dimensions, we move to the right and downward on the page.
-func encodeLines(d int, pts []int) []string {
-	if d == 0 {
-		if util.Contains(pts, ORIGIN) {
-			return []string{pointSymbol}
-		}
-		return []string{emptySymbol}
-	}
-
-	// Get string representations for the 3 projections.
-	proj := projections(d, pts)
-	lines0 := encodeLines(d-1, proj[0])
-	lines1 := encodeLines(d-1, proj[1])
-	lines2 := encodeLines(d-1, proj[2])
-
-	var lines []string
-	if d%2 == 1 {
-		// In odd dimensions, combine arrays of lines (going down).
-		lines = append(lines, lines0...)
-		for i := 0; i < numSpacers(d); i++ {
-			lines = append(lines, "")
-		}
-		lines = append(lines, lines1...)
-		for i := 0; i < numSpacers(d); i++ {
-			lines = append(lines, "")
-		}
-		lines = append(lines, lines2...)
-	} else {
-		// In even dimensions, combine corresponding lines (going rightward).
-		for i := range lines0 {
-			spacer := strings.Repeat(" ", numSpacers(d))
-			line := fmt.Sprintf("%v%v%v%v%v", lines0[i], spacer, lines1[i], spacer, lines2[i])
-			lines = append(lines, line)
-		}
-	}
-	return lines
-}
-
-// Split pts into 3 sets by projecting along the last dimension.
-func projections(d int, pts []int) [][]int {
-	oneThird := util.Pow(3, d-1)
-	projections := [][]int{{}, {}, {}}
-
-	for _, p := range pts {
-		index := p / oneThird
-		value := p % oneThird
-		projections[index] = append(projections[index], value)
-	}
-	return projections
-}
-
-// numSpacers returns the number of blank spacers used to separate
-// encodings of larger dimension d.
-// For d = 1,2,3,..., the sequence is 0, 1, 1, 4, 4, 9, 9...
-func numSpacers(d int) int {
-	var half int
-	if d%2 == 0 {
-		half = d / 2
-	} else {
-		half = (d - 1) / 2
-	}
-	return half * half
 }
