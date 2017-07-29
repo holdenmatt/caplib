@@ -47,22 +47,3 @@ func ExampleCells_GetQIsoms() {
 	// Output:
 	// 48
 }
-
-func ExampleCells_CIsomsMinimizingRoot() {
-	cells := New(space.New(4), []int{4, 2, 2, 2, 2, 2, 2, 2, 2})
-	root := NewBits32([]int{1, 2, 3, 6})
-	cIsoms := cells.CIsomsMinimizingRoot(root)
-	fmt.Println(cIsoms.Perms)
-
-	// Output:
-	// [[0 1 2 3 4 5 6 7 8] [0 2 1 3 5 4 6 8 7] [0 1 2 6 7 8 3 4 5] [0 2 1 6 8 7 3 5 4] [0 3 6 1 4 7 2 5 8] [0 3 6 2 5 8 1 4 7] [0 6 3 1 7 4 2 8 5] [0 6 3 2 8 5 1 7 4]]
-}
-
-func ExampleCells_QIsomsFixingCounts() {
-	cells := New(space.New(4), []int{4, 2, 2, 2, 2, 2, 2, 2, 2})
-	qIsoms := cells.QIsomsFixingCounts([]int{4, 2, 2, 2, 0, 0, 2, 0, 0})
-	fmt.Println(qIsoms.Perms)
-
-	// Output:
-	// [[0 1 2 3 4 5 6 7 8] [0 1 2 6 7 8 3 4 5] [0 2 1 3 5 4 6 8 7] [0 2 1 6 8 7 3 5 4] [0 3 6 1 4 7 2 5 8] [0 3 6 2 5 8 1 4 7] [0 6 3 1 7 4 2 8 5] [0 6 3 2 8 5 1 7 4]]
-}

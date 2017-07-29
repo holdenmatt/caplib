@@ -291,6 +291,11 @@ func (vec BitsVec) EliminatedInCell(cells Cells, cell int) Bits32 {
 	return bits
 }
 
+// Equals returns true iff vec == other.
+func (vec BitsVec) Equals(other BitsVec) bool {
+	return vec.Cmp(other) == 0
+}
+
 // GetIndices computes vec[indices], in an out BitsVec.
 func (vec BitsVec) GetIndices(indices []int, out BitsVec) {
 	if len(indices) != len(out) {

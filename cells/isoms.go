@@ -1,10 +1,8 @@
 package cells
 
 import (
-	"fmt"
 	"log"
 
-	"github.com/deckarep/golang-set"
 	"github.com/holdenmatt/util"
 )
 
@@ -180,99 +178,12 @@ func (c Cells) GetQIsoms() *util.Perms {
 	return &perms
 }
 
-// CIsomsMinimizingRoot returns the subset of CIsoms that minimize the given root bits.
-func (c Cells) CIsomsMinimizingRoot(root Bits32) *CellPerms {
-	var perms [][]int
-	var image1, image2, minImage Bits32
-
-	for _, perm1 := range c.CIsoms.Perms1.Perms {
-		image1 = root.Apply(perm1)
-		for _, perm2 := range c.CIsoms.Perms2.Perms {
-			image2 = image1.Apply(perm2)
-
-			if image2.Less(minImage) {
-				minImage = image2
-				perms = nil
-			}
-
-			if image2 == minImage {
-				perm := util.Compose(perm1, perm2)
-				perms = append(perms, perm)
-			}
-		}
-	}
-	// log.Printf("%d of %d CIsoms preserve: %v", len(perms), c.CIsoms.Len(), root)
-	return c.NewCellPerms(perms)
-}
-
-// QIsomsFixingCounts returns the subset of QIsoms that preserve the given counts,
-// up to uniqueness on the nonzero counts.
-func (c Cells) QIsomsFixingCounts(counts []int) util.Perms {
-	nonzeroIndices := util.Nonzero(counts)
-	seen := mapset.NewSet()
-
-	var perms [][]int
-	for _, perm := range c.QIsoms.Perms {
-		if util.PreservesValues(perm, counts) {
-			// Take unique perms on the nonzero indices (using its String as a Set key)
-			nonzeroPerm := util.GetIndices(perm, nonzeroIndices)
-			key := fmt.Sprintf("%v", nonzeroPerm)
-			if !(seen.Contains(key)) {
-				seen.Add(key)
-				perms = append(perms, perm)
-			}
-		}
-	}
-	// log.Printf("%d of %d QIsoms preserve counts: %v", len(perms), c.QIsoms.Len(), counts)
-	return util.NewPerms(perms)
-}
-
-//
-//--- Shears ---//
-//
-
-// MinShear computes the minimal shear of a BitsVec, in place.
-// Only shear a dimension if its basis value is nonzero (which means this may not
-// be minimal in some cases, so we won't dedup as much as we could).
-func (c Cells) MinShear(vec BitsVec) {
-	basis := c.QSpace.StdBasis
-	for i, basisPt := range basis {
-		bits := vec[basisPt]
-		if bits != 0 {
-			minTIndex := c.Translations.MinImageIndex(bits)
-
-			// No need to shear if it's the identity.
-			if minTIndex != 0 {
-				c.iShear(vec, minTIndex, i)
-			}
-		}
-	}
-}
-
-// iShear applies a shear to a BitsVec in place: apply the translation with a given
-// index along the ith coordinate direction.
-func (c Cells) iShear(vec BitsVec, transIndex int, i int) {
-	translations := c.Translations
-
-	index := (c.QSpace.D - 1) - i // Why?
-	for k, qVec := range c.QSpace.Vecs.Vecs {
-		value := qVec[index]
-		if value == 1 {
-			vec[k] = translations.Apply(transIndex, vec[k])
-		} else if value == 2 {
-			vec[k] = translations.Apply(transIndex, vec[k])
-			vec[k] = translations.Apply(transIndex, vec[k])
-		}
-	}
-}
-
-// Shearer is used to compute min shears.
+// Shearer is used to compute the minimal shear of a BitsVec.
 type Shearer struct {
 	cells        Cells
 	nonzeroBasis []int
 	basisSpan    []int
-
-	minTIndex []int
+	minTIndex    []int
 }
 
 // NewShearer creates a new Shearer.
@@ -289,8 +200,8 @@ func (c Cells) NewShearer() Shearer {
 	return Shearer{c, basis, basisSpan, minTIndex}
 }
 
-// MinShear2 computes the minimal shear of a BitsVec, in place.
-func (s Shearer) MinShear2(vec BitsVec) {
+// MinShear computes the minimal shear of a BitsVec, in place.
+func (s Shearer) MinShear(vec BitsVec) {
 	c := s.cells
 	basis := s.nonzeroBasis
 
