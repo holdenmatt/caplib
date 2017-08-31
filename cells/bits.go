@@ -5,11 +5,14 @@ import (
 	"github.com/holdenmatt/caplib/space"
 )
 
-// cmp stores precomputed byte comparisons such that cmp[i][j] = Cmp(i, j).
+// _cmp stores precomputed byte comparisons such that _cmp[i][j] = Cmp(i, j).
 var _cmp [256][256]int
 
-// inv stores precomputed inverses of each byte in a Bits32.
+// _inv stores precomputed inverses of each byte in a Bits32.
 var _inv [4][256]Bits32
+
+// _elim stores precomputed Bits32 bits eliminated by various bytes.
+var _elim [16][256][256]Bits32
 
 func init() {
 	for i := 0; i < 255; i++ {
@@ -38,6 +41,30 @@ func init() {
 			_inv[pos][j] = jInv
 		}
 	}
+
+	for i := 0; i < 255; i++ {
+		for j := 0; j < 255; j++ {
+			i1, i2, i3, i4 := Bits32(i), Bits32(i<<8), Bits32(i<<16), Bits32(i<<24)
+			j1, j2, j3, j4 := Bits32(j), Bits32(j<<8), Bits32(j<<16), Bits32(j<<24)
+
+			_elim[0][i][j] = elim(i1, j1)
+			_elim[1][i][j] = elim(i1, j2)
+			_elim[2][i][j] = elim(i1, j3)
+			_elim[3][i][j] = elim(i1, j4)
+			_elim[4][i][j] = elim(i2, j1)
+			_elim[5][i][j] = elim(i2, j2)
+			_elim[6][i][j] = elim(i2, j3)
+			_elim[7][i][j] = elim(i2, j4)
+			_elim[8][i][j] = elim(i3, j1)
+			_elim[9][i][j] = elim(i3, j2)
+			_elim[10][i][j] = elim(i3, j3)
+			_elim[11][i][j] = elim(i3, j4)
+			_elim[12][i][j] = elim(i4, j1)
+			_elim[13][i][j] = elim(i4, j2)
+			_elim[14][i][j] = elim(i4, j3)
+			_elim[15][i][j] = elim(i4, j4)
+		}
+	}
 }
 
 // byteCmp compares two bytes lexicographically as bit vectors.
@@ -53,6 +80,24 @@ func byteCmp(a, b byte) int {
 		}
 	}
 	return 0
+}
+
+func elim(a, b Bits32) Bits32 {
+	cSpace := space.New(3)
+	cellSize := len(cSpace.Pts)
+
+	var bits Bits32
+	for i := 0; i < cellSize; i++ {
+		if a.Test(i) {
+			elim := cSpace.Elim[i]
+			for j := 0; j < cellSize; j++ {
+				if b.Test(j) {
+					bits = bits.Set(elim[j])
+				}
+			}
+		}
+	}
+	return bits
 }
 
 //
@@ -186,20 +231,46 @@ func (b Bits32) PopCount() int {
 
 // Eliminated returns the pts eliminated by a & b.
 func (c Cells) Eliminated(a Bits32, b Bits32) Bits32 {
-	cellSize := len(c.CSpace.Pts)
-	var bits Bits32
+	return c.EliminatedFast(a, b)
 
-	for i := 0; i < cellSize; i++ {
-		if a.Test(i) {
-			elim := c.CSpace.Elim[i]
-			for j := 0; j < cellSize; j++ {
-				if b.Test(j) {
-					bits = bits.Set(elim[j])
+	/*
+		cellSize := len(c.CSpace.Pts)
+		var bits Bits32
+		for i := 0; i < cellSize; i++ {
+			if a.Test(i) {
+				elim := c.CSpace.Elim[i]
+				for j := 0; j < cellSize; j++ {
+					if b.Test(j) {
+						bits = bits.Set(elim[j])
+					}
 				}
 			}
 		}
-	}
-	return bits
+		return bits
+	*/
+}
+
+// EliminatedFast returns the pts eliminated by a & b.
+func (c Cells) EliminatedFast(a Bits32, b Bits32) Bits32 {
+	a1, a2, a3, a4 := byte(a), byte(a>>8), byte(a>>16), byte(a>>24)
+	b1, b2, b3, b4 := byte(b), byte(b>>8), byte(b>>16), byte(b>>24)
+
+	return (_elim[0][a1][b1] |
+		_elim[1][a1][b2] |
+		_elim[2][a1][b3] |
+		_elim[3][a1][b4] |
+		_elim[4][a2][b1] |
+		_elim[5][a2][b2] |
+		_elim[6][a2][b3] |
+		_elim[7][a2][b4] |
+		_elim[8][a3][b1] |
+		_elim[9][a3][b2] |
+		_elim[10][a3][b3] |
+		_elim[11][a3][b4] |
+		_elim[12][a4][b1] |
+		_elim[13][a4][b2] |
+		_elim[14][a4][b3] |
+		_elim[15][a4][b4])
 }
 
 //
