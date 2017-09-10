@@ -22,12 +22,12 @@ func TestPlanes(t *testing.T) {
 	assert.Equal(planes.perp[2][2], false)
 	assert.Equal(planes.perp[1][3], true)
 
-	pts := NewPoints(space, []int{3, 4, 5, 6, 7, 8})
+	pts := []int{3, 4, 5, 6, 7, 8}
 
-	assert.Equal(planes.planeCount(pts, 1), 2)
-	assert.Equal(planes.planeCount(pts, 3), 0)
+	assert.Equal(planes.PlaneCount(pts, 1), 2)
+	assert.Equal(planes.PlaneCount(pts, 3), 0)
 	assert.Panics(func() {
-		planes.planeCount(pts, 0)
+		planes.PlaneCount(pts, 0)
 	})
 
 	assert.Equal(planes.PlaneCountsString(pts), "[0 2] => [1 3]")

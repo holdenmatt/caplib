@@ -28,8 +28,8 @@ func NewPlanes(s *Space) *Planes {
 
 // PlaneCountsString returns plane counts as a string "[keys] => [values]"
 // sorted by key.
-func (p Planes) PlaneCountsString(pts *Points) string {
-	counts := p.planeCounts(pts)
+func (p Planes) PlaneCountsString(pts []int) string {
+	counts := p.planeCountsMap(pts)
 
 	// Sort keys.
 	var keys []int
@@ -48,11 +48,11 @@ func (p Planes) PlaneCountsString(pts *Points) string {
 	return fmt.Sprintf("%v => %v", keys, values)
 }
 
-// CountsAtMost returns true iff all plane intersections of a Points
+// CountsAtMost returns true iff all plane intersections with pts
 // are at most a given max.
-func (p Planes) CountsAtMost(pts *Points, max int) bool {
+func (p Planes) CountsAtMost(pts []int, max int) bool {
 	for _, normal := range p.space.Directions {
-		count := p.planeCount(pts, normal)
+		count := p.PlaneCount(pts, normal)
 
 		if count > max {
 			return false
@@ -61,15 +61,15 @@ func (p Planes) CountsAtMost(pts *Points, max int) bool {
 	return true
 }
 
-// planeCount returns the count of pts in the plane orthogonal to a given normal pt.
-func (p Planes) planeCount(pts *Points, normal int) int {
+// PlaneCount returns the count of pts in the plane orthogonal to a given normal pt.
+func (p Planes) PlaneCount(pts []int, normal int) int {
 	if normal == ORIGIN {
 		panic("normal must be nonzero")
 	}
 
 	count := 0
 	perp := p.perp[normal]
-	for _, p := range pts.Pts {
+	for _, p := range pts {
 		if perp[p] {
 			count++
 		}
@@ -77,15 +77,15 @@ func (p Planes) planeCount(pts *Points, normal int) int {
 	return count
 }
 
-// planeCounts maps each plane count to the # of planes through the origin
+// planeCountsMap maps each plane count to the # of planes through the origin
 // with that count.
 //
 // This is invariant under linear isomorphisms, so if two Points have differing
-// PlaneCounts they cannot be isomorphic.
-func (p Planes) planeCounts(pts *Points) map[int]int {
+// plane counts they cannot be isomorphic.
+func (p Planes) planeCountsMap(pts []int) map[int]int {
 	counts := make(map[int]int)
-	for _, normal := range pts.Space.Directions {
-		count := p.planeCount(pts, normal)
+	for _, normal := range p.space.Directions {
+		count := p.PlaneCount(pts, normal)
 		if _, exists := counts[count]; exists {
 			counts[count]++
 		} else {
@@ -93,4 +93,18 @@ func (p Planes) planeCounts(pts *Points) map[int]int {
 		}
 	}
 	return counts
+}
+
+// PlaneCounts returns all plane counts in a given out slice.
+func (p Planes) PlaneCounts(pts []int, out []int) []int {
+	if len(out) != len(p.space.Directions) {
+		fmt.Println(len(out))
+		fmt.Println(len(p.space.Directions))
+		panic("length mismatch")
+	}
+
+	for i, normal := range p.space.Directions {
+		out[i] = p.PlaneCount(pts, normal)
+	}
+	return out
 }
