@@ -273,6 +273,27 @@ func (c Cells) EliminatedFast(a Bits32, b Bits32) Bits32 {
 		_elim[15][a4][b4])
 }
 
+// ToCellPoints converts a bits (and corresponding inverses) at a given depth to an []int of pts.
+// The results are written to out (which is overwritten), and are _unsorted_.
+func (c Cells) ToCellPoints(bits Bits32, depth int, out []int) []int {
+	out = out[:0]
+
+	cell := c.ProjCells.Indices[depth]
+	offset := c.Cells[cell][0]
+
+	var pt int
+	for i := 0; i < 32; i++ {
+		if bits.Test(i) {
+			pt = offset + i
+			out = append(out, pt)
+			if cell != 0 {
+				out = append(out, c.Space.Inv[pt])
+			}
+		}
+	}
+	return out
+}
+
 //
 //--- BitsVec ---//
 //
