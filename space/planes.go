@@ -48,19 +48,6 @@ func (p Planes) PlaneCountsString(pts []int) string {
 	return fmt.Sprintf("%v => %v", keys, values)
 }
 
-// CountsAtMost returns true iff all plane intersections with pts
-// are at most a given max.
-func (p Planes) CountsAtMost(pts []int, max int) bool {
-	for _, normal := range p.space.Directions {
-		count := p.PlaneCount(pts, normal)
-
-		if count > max {
-			return false
-		}
-	}
-	return true
-}
-
 // PlaneCount returns the count of pts in the plane orthogonal to a given normal pt.
 func (p Planes) PlaneCount(pts []int, normal int) int {
 	if normal == ORIGIN {

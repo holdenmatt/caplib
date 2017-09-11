@@ -231,23 +231,19 @@ func (b Bits32) PopCount() int {
 
 // Eliminated returns the pts eliminated by a & b.
 func (c Cells) Eliminated(a Bits32, b Bits32) Bits32 {
-	return c.EliminatedFast(a, b)
-
-	/*
-		cellSize := len(c.CSpace.Pts)
-		var bits Bits32
-		for i := 0; i < cellSize; i++ {
-			if a.Test(i) {
-				elim := c.CSpace.Elim[i]
-				for j := 0; j < cellSize; j++ {
-					if b.Test(j) {
-						bits = bits.Set(elim[j])
-					}
+	cellSize := len(c.CSpace.Pts)
+	var bits Bits32
+	for i := 0; i < cellSize; i++ {
+		if a.Test(i) {
+			elim := c.CSpace.Elim[i]
+			for j := 0; j < cellSize; j++ {
+				if b.Test(j) {
+					bits = bits.Set(elim[j])
 				}
 			}
 		}
-		return bits
-	*/
+	}
+	return bits
 }
 
 // EliminatedFast returns the pts eliminated by a & b.
@@ -376,7 +372,7 @@ func (vec BitsVec) EliminatedInCell(cells Cells, cell int) Bits32 {
 			bitsP := vec[p]
 			bitsThird := vec[third]
 			if !bitsP.Empty() && !bitsThird.Empty() {
-				bits |= cells.Eliminated(bitsP, bitsThird)
+				bits |= cells.EliminatedFast(bitsP, bitsThird)
 			}
 		}
 	}

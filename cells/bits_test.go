@@ -114,7 +114,7 @@ func TestEliminated(t *testing.T) {
 	bits1 := NewBits32([]int{1, 2})
 	bits2 := NewBits32([]int{3, 6})
 	expected := NewBits32([]int{4, 5, 7, 8})
-	assert.Equal(expected, cells.Eliminated(bits1, bits2))
+	assert.Equal(expected, cells.EliminatedFast(bits1, bits2))
 }
 
 func ExampleBitsVec() {
