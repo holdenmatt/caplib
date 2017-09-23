@@ -406,20 +406,20 @@ func (vec BitsVec) PermuteValues(qIsom []int, out BitsVec) {
 	}
 }
 
-// ToPoints converts a BitsVec to a Points.
-func (vec BitsVec) ToPoints(c Cells) *space.Points {
+// ToPoints converts a BitsVec to pts, using a given slice.
+func (vec BitsVec) ToPoints(c Cells, out []int) []int {
 	if len(vec) != len(c.Cells) {
 		panic("length mismatch")
 	}
 
-	var pts []int
+	out = out[:0]
 	for k, bits := range vec {
 		offset := c.Cells[k][0]
 		for i := 0; i < 32; i++ {
 			if bits.Test(i) {
-				pts = append(pts, offset+i)
+				out = append(out, offset+i)
 			}
 		}
 	}
-	return space.NewPoints(c.Space, pts)
+	return out
 }
