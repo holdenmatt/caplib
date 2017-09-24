@@ -85,8 +85,6 @@ func (p Planes) planeCountsMap(pts []int) map[int]int {
 // PlaneCounts returns all plane counts in a given out slice.
 func (p Planes) PlaneCounts(pts []int, out []int) []int {
 	if len(out) != len(p.space.Directions) {
-		fmt.Println(len(out))
-		fmt.Println(len(p.space.Directions))
 		panic("length mismatch")
 	}
 

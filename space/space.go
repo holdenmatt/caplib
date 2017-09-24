@@ -72,6 +72,16 @@ func (s Space) Size() int {
 	return len(s.Pts)
 }
 
+// IsSymmetric returns true iff pts is closed under inverses.
+func (s Space) IsSymmetric(pts []int) bool {
+	for _, p := range pts {
+		if !util.Contains(pts, s.Inv[p]) {
+			return false
+		}
+	}
+	return true
+}
+
 // Span returns the span of vectors with given indices,
 // in the order of coefficient vectors.
 func (s Space) Span(indices []int) []int {
