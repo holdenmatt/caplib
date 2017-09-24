@@ -19,9 +19,10 @@ import (
 //
 // We assign a count to each cell, so we can prune search nodes that exceed any count.
 type Cells struct {
-	Space  *space.Space // Space to partition into cells
-	Cells  [][]int      // Partition space.pts into disjoint cells
-	Counts []int        // Assign a fixed target count to each cell
+	Space    *space.Space // Space to partition into cells
+	Cells    [][]int      // Partition space.pts into disjoint cells
+	Counts   []int        // Assign a fixed target count to each cell
+	CellSize int          // Size of each cell.
 
 	CSpace *space.Space // "Cell space" (isomorphic to cells[0])
 	QSpace *space.Space // "Quotient space" (isomorphic to space / cSpace)
@@ -68,13 +69,23 @@ func New(s *space.Space, counts []int) Cells {
 		}
 	}
 
-	c := Cells{s, cells, counts, cSpace, qSpace, nil, nil, nil, nil, nil}
+	c := Cells{s, cells, counts, cellSize, cSpace, qSpace, nil, nil, nil, nil, nil}
 	c.ProjCells = NewProjCells(c)
 	c.Translations = c.NewCellPerms(cSpace.Translations().Perms)
 	c.CIsoms = c.GetCIsoms()
 	c.QIsoms = c.GetQIsoms()
 	c.BitsVec = c.NewBitsVec()
 	return c
+}
+
+// MinPt returns the min point in a given cell.
+func (c *Cells) MinPt(cell int) int {
+	return cell * c.CellSize
+}
+
+// MaxPt returns the max point in a given cell.
+func (c *Cells) MaxPt(cell int) int {
+	return (cell+1)*c.CellSize - 1
 }
 
 // ProjCells represents the "projective" subset of a Cells.

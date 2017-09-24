@@ -275,12 +275,12 @@ func (c Cells) ToCellPoints(bits Bits32, depth int, out []int) []int {
 	out = out[:0]
 
 	cell := c.ProjCells.Indices[depth]
-	offset := c.Cells[cell][0]
+	min := c.MinPt(cell)
 
 	var pt int
 	for i := 0; i < 32; i++ {
 		if bits.Test(i) {
-			pt = offset + i
+			pt = min + i
 			out = append(out, pt)
 			if cell != 0 {
 				out = append(out, c.Space.Inv[pt])
@@ -414,10 +414,10 @@ func (vec BitsVec) ToPoints(c Cells, out []int) []int {
 
 	out = out[:0]
 	for k, bits := range vec {
-		offset := c.Cells[k][0]
+		min := c.MinPt(k)
 		for i := 0; i < 32; i++ {
 			if bits.Test(i) {
-				out = append(out, offset+i)
+				out = append(out, min+i)
 			}
 		}
 	}
