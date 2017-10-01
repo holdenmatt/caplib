@@ -32,8 +32,6 @@ type Cells struct {
 	Translations *CellPerms         // Translations of CSpace
 	CIsoms       *util.PermsProduct // CSpace isoms
 	QIsoms       *util.Perms        // QSpace isoms that preserve counts
-
-	BitsVec BitsVec // Reusable buffer
 }
 
 // New creates a new Cells in a Space with the given counts.
@@ -69,12 +67,11 @@ func New(s *space.Space, counts []int) Cells {
 		}
 	}
 
-	c := Cells{s, cells, counts, cellSize, cSpace, qSpace, nil, nil, nil, nil, nil}
+	c := Cells{s, cells, counts, cellSize, cSpace, qSpace, nil, nil, nil, nil}
 	c.ProjCells = NewProjCells(c)
 	c.Translations = c.NewCellPerms(cSpace.Translations().Perms)
 	c.CIsoms = c.GetCIsoms()
 	c.QIsoms = c.GetQIsoms()
-	c.BitsVec = c.NewBitsVec()
 	return c
 }
 
