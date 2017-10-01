@@ -3,33 +3,67 @@ package space
 import (
 	"fmt"
 	"sort"
+
+	"github.com/willf/bitset"
 )
 
 // Planes represents all planes in a Space through the origin, and provides
-// methods to compute plane intersection counts of Points.
+// methods to compute plane intersection counts.
 type Planes struct {
-	space *Space
-	perp  [][]bool // Map (p, q) -> true iff p and q are orthogonal.
+	space      *Space
+	planes     []bitset.BitSet // For each direction, store the orthogonal plane directions.
+	directions bitset.BitSet   // Reusable buffer for directions.
 }
 
 // NewPlanes creates a new Planes.
 func NewPlanes(s *Space) *Planes {
-	size := s.Size()
-	perp := make([][]bool, size)
-	for _, p := range s.Pts {
-		perp[p] = make([]bool, size)
-		for _, q := range s.Pts {
-			perp[p][q] = s.Vecs.Dot(p, q) == 0
+	var planes []bitset.BitSet
+
+	l := uint(len(s.Directions))
+
+	for _, p := range s.Directions {
+		plane := bitset.New(l)
+		for i, q := range s.Directions {
+			if s.Vecs.Dot(p, q) == 0 {
+				plane.Set(uint(i))
+			}
 		}
+		planes = append(planes, *plane)
 	}
 
-	return &Planes{s, perp}
+	directions := bitset.New(l)
+
+	return &Planes{s, planes, *directions}
 }
 
-// PlaneCountsString returns plane counts as a string "[keys] => [values]"
-// sorted by key.
-func (p Planes) PlaneCountsString(pts []int) string {
-	counts := p.planeCountsMap(pts)
+func (p Planes) planeCount(directions *bitset.BitSet, index int) int {
+	plane := p.planes[index]
+	return 2 * int(plane.IntersectionCardinality(directions))
+}
+
+// CountExceeds returns true iff a given directions BitSet has a plane exceeding max.
+func (p Planes) CountExceeds(directions *bitset.BitSet, max int) bool {
+	for i := range p.planes {
+		count := p.planeCount(directions, i)
+		if count > max {
+			return true
+		}
+	}
+	return false
+}
+
+// PlaneCountsString returns plane counts as a string "[keys] => [values]" sorted by key.
+func (p Planes) PlaneCountsString(directions *bitset.BitSet) string {
+	// Map each plane count to the # of planes through the origin with that count.
+	counts := make(map[int]int)
+	for i := range p.planes {
+		count := p.planeCount(directions, i)
+		if _, exists := counts[count]; exists {
+			counts[count]++
+		} else {
+			counts[count] = 1
+		}
+	}
 
 	// Sort keys.
 	var keys []int
@@ -46,50 +80,4 @@ func (p Planes) PlaneCountsString(pts []int) string {
 
 	// Print "[keys] => [values]"
 	return fmt.Sprintf("%v => %v", keys, values)
-}
-
-// PlaneCount returns the count of pts in the plane orthogonal to a given normal pt.
-func (p Planes) PlaneCount(pts []int, normal int) int {
-	if normal == ORIGIN {
-		panic("normal must be nonzero")
-	}
-
-	count := 0
-	perp := p.perp[normal]
-	for _, p := range pts {
-		if perp[p] {
-			count++
-		}
-	}
-	return count
-}
-
-// planeCountsMap maps each plane count to the # of planes through the origin
-// with that count.
-//
-// This is invariant under linear isomorphisms, so if two Points have differing
-// plane counts they cannot be isomorphic.
-func (p Planes) planeCountsMap(pts []int) map[int]int {
-	counts := make(map[int]int)
-	for _, normal := range p.space.Directions {
-		count := p.PlaneCount(pts, normal)
-		if _, exists := counts[count]; exists {
-			counts[count]++
-		} else {
-			counts[count] = 1
-		}
-	}
-	return counts
-}
-
-// PlaneCounts returns all plane counts in a given out slice.
-func (p Planes) PlaneCounts(pts []int, out []int) []int {
-	if len(out) != len(p.space.Directions) {
-		panic("length mismatch")
-	}
-
-	for i, normal := range p.space.Directions {
-		out[i] = p.PlaneCount(pts, normal)
-	}
-	return out
 }

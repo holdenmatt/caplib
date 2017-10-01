@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/willf/bitset"
 )
 
 func init() {
@@ -18,17 +19,14 @@ func TestPlanes(t *testing.T) {
 	space := New(2)
 	planes := space.Planes
 
-	assert.Equal(planes.perp[0][1], true)
-	assert.Equal(planes.perp[2][2], false)
-	assert.Equal(planes.perp[1][3], true)
-
 	pts := []int{3, 4, 5, 6, 7, 8}
+	directions := bitset.New(uint(len(space.Directions)))
+	for _, p := range pts {
+		dir := space.PtToDirection[p]
+		if dir != -1 {
+			directions.Set(uint(dir))
+		}
+	}
 
-	assert.Equal(planes.PlaneCount(pts, 1), 2)
-	assert.Equal(planes.PlaneCount(pts, 3), 0)
-	assert.Panics(func() {
-		planes.PlaneCount(pts, 0)
-	})
-
-	assert.Equal(planes.PlaneCountsString(pts), "[0 2] => [1 3]")
+	assert.Equal(planes.PlaneCountsString(directions), "[0 2] => [1 3]")
 }

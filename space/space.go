@@ -17,8 +17,9 @@ type Space struct {
 	Elim   [][]int // Map (p, q) -> the eliminated pt (the one that creates a line)
 	Planes *Planes // Planes through the origin.
 
-	StdBasis   []int // Standard basis indices
-	Directions []int // Indices of unique directions
+	StdBasis      []int // Standard basis indices
+	Directions    []int // Indices of unique directions
+	PtToDirection []int // Map each direction pt to its index in Directions (else -1).
 }
 
 // Cache a unique Space for each dimension.
@@ -54,7 +55,13 @@ func New(d int) *Space {
 		StdBasis := vecs.StdBasis()
 		Directions := vecs.Directions()
 
-		s := &Space{d, vecs, Pts, Inv, Sum, Elim, nil, StdBasis, Directions}
+		ptToDirection := make([]int, l)
+		util.Fill(ptToDirection, -1)
+		for i, dir := range Directions {
+			ptToDirection[dir] = i
+		}
+
+		s := &Space{d, vecs, Pts, Inv, Sum, Elim, nil, StdBasis, Directions, ptToDirection}
 		s.Planes = NewPlanes(s)
 		spaceCache[d] = s
 	}
