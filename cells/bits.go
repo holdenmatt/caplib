@@ -1,7 +1,8 @@
 package cells
 
 import (
-	"github.com/cznic/mathutil"
+	"math/bits"
+
 	"github.com/holdenmatt/caplib/space"
 )
 
@@ -226,7 +227,7 @@ func (b Bits32) Maximum() int {
 
 // PopCount returns population count of b (number of bits set).
 func (b Bits32) PopCount() int {
-	return mathutil.PopCountUint32(uint32(b))
+	return bits.OnesCount32(uint32(b))
 }
 
 // Eliminated returns the pts eliminated by a & b.
