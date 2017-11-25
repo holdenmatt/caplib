@@ -11,11 +11,10 @@ type Space struct {
 	D    int              // Dimension
 	Vecs *CoordinatesModN // The space of coordinate d-vectors
 
-	Pts    []int   // Instead of dealing with vecs, we work with their indices ("points")
-	Inv    []int   // Map each pt p -> -p
-	Sum    [][]int // Map (p, q) -> p + q
-	Elim   [][]int // Map (p, q) -> the eliminated pt (the one that creates a line)
-	Planes *Planes // Planes through the origin.
+	Pts  []int   // Instead of dealing with vecs, we work with their indices ("points")
+	Inv  []int   // Map each pt p -> -p
+	Sum  [][]int // Map (p, q) -> p + q
+	Elim [][]int // Map (p, q) -> the eliminated pt (the one that creates a line)
 
 	StdBasis      []int // Standard basis indices
 	Directions    []int // Indices of unique directions
@@ -61,9 +60,7 @@ func New(d int) *Space {
 			ptToDirection[dir] = i
 		}
 
-		s := &Space{d, vecs, Pts, Inv, Sum, Elim, nil, StdBasis, Directions, ptToDirection}
-		s.Planes = NewPlanes(s)
-		spaceCache[d] = s
+		spaceCache[d] = &Space{d, vecs, Pts, Inv, Sum, Elim, StdBasis, Directions, ptToDirection}
 	}
 
 	return spaceCache[d]

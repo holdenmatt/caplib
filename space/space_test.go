@@ -16,14 +16,14 @@ func init() {
 func TestSpaceCache(t *testing.T) {
 	assert := assert.New(t)
 
+	assert.Equal(len(spaceCache), 0)
+	New(1)
 	assert.Equal(len(spaceCache), 1)
 	New(1)
-	assert.Equal(len(spaceCache), 2)
 	New(1)
-	New(1)
-	assert.Equal(len(spaceCache), 2)
+	assert.Equal(len(spaceCache), 1)
 	New(3)
-	assert.Equal(len(spaceCache), 3)
+	assert.Equal(len(spaceCache), 2)
 }
 
 func TestSpace(t *testing.T) {
