@@ -10,9 +10,10 @@ import (
 // Planes represents all planes in a Space through the origin, and provides
 // methods to compute plane intersection counts.
 type Planes struct {
-	space      *Space
-	planes     []bitset.BitSet // For each direction, store the orthogonal plane directions.
-	directions bitset.BitSet   // Reusable buffer for directions.
+	space  *Space
+	planes []bitset.BitSet // For each direction, store the orthogonal plane directions.
+
+	Buffer *bitset.BitSet // Reusable buffer for directions.
 }
 
 // NewPlanes creates a new Planes.
@@ -33,7 +34,7 @@ func NewPlanes(s *Space) *Planes {
 
 	directions := bitset.New(l)
 
-	return &Planes{s, planes, *directions}
+	return &Planes{s, planes, directions}
 }
 
 func (p Planes) planeCount(directions *bitset.BitSet, index int) int {

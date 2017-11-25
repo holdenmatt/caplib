@@ -159,6 +159,40 @@ func NewPoints(s *Space, pts []int) *Points {
 	return &Points{s, pts}
 }
 
+// NewPoints creates a new Points in a Space.
+func (s *Space) NewPoints(pts []int) *Points {
+	return NewPoints(s, pts)
+}
+
+// IsSym returns true iff a Points is symmetric across the origin.
+func (pts Points) IsSym() bool {
+	for _, p := range pts.Pts {
+		pInv := pts.Space.Inv[p]
+		if p < pInv {
+			if !util.Contains(pts.Pts, pInv) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// IsCap returns true iff a Points contains no lines.
+func (pts Points) IsCap() bool {
+	for _, p := range pts.Pts {
+		for _, q := range pts.Pts {
+			if p < q {
+				r := pts.Space.Elim[p][q]
+				if util.Contains(pts.Pts, r) {
+					fmt.Println(p, q, r)
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
 // String returns the default string representation of Points.
 func (pts Points) String() string {
 	return fmt.Sprintf("Points[%v]", util.Join(pts.Pts, ", "))
