@@ -424,3 +424,17 @@ func (vec BitsVec) ToPoints(c Cells, out []int) []int {
 	}
 	return out
 }
+
+// CopyFrom copies a given set of pts into this BitsVec.
+func (vec BitsVec) CopyFrom(c Cells, pts []int) BitsVec {
+	vec.Clear()
+
+	for _, p := range pts {
+		cell := c.CellIndex(p)
+		index := p - c.MinPt(cell)
+
+		vec[cell] = vec[cell].Set(index)
+	}
+
+	return vec
+}
