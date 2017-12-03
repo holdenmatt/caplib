@@ -85,6 +85,16 @@ func (c *Cells) MaxPt(cell int) int {
 	return (cell+1)*c.CellSize - 1
 }
 
+// CellIndex returns the index of the cell containing a given point.
+func (c *Cells) CellIndex(pt int) int {
+	if !(0 <= pt && pt < c.Space.Size()) {
+		panic("pt index out of range")
+	}
+
+	cell := pt / c.CellSize
+	return cell
+}
+
 // ProjCells represents the "projective" subset of a Cells.
 //
 // The cells correspond to the origin and directions in QSpace, and are
