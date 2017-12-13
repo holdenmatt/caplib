@@ -95,6 +95,25 @@ func (c *Cells) CellIndex(pt int) int {
 	return cell
 }
 
+// NonzeroBasis finds the smallest basis for QSpace such that
+// all partition values are nonzero.
+func (c *Cells) NonzeroBasis() []int {
+	var basis []int
+	var span []int
+
+	i := 1
+	for len(basis) < c.QSpace.D {
+		for c.Counts[i] == 0 || util.Contains(span, i) {
+			i++
+		}
+
+		basis = append(basis, i)
+		span = c.QSpace.Span(basis)
+	}
+
+	return basis
+}
+
 // ProjCells represents the "projective" subset of a Cells.
 //
 // The cells correspond to the origin and directions in QSpace, and are

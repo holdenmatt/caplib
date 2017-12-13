@@ -181,25 +181,26 @@ func (c Cells) GetQIsoms() *util.Perms {
 // Shearer is used to compute the minimal shear of a BitsVec.
 type Shearer struct {
 	cells              Cells
-	nonzeroBasis       []int
-	basisSpan          []int
+	nonzeroBasis       []int   // Smallest basis of QSpace with nonzero cell values.
+	coeffs             [][]int // Express each point i as coeffs in the nonzero basis.
 	minTIndex          []int
 	minTranslatesCache map[int][]int
 }
 
 // NewShearer creates a new Shearer.
 func (c Cells) NewShearer() Shearer {
-	basis := c.nonzeroBasis()
+	basis := c.NonzeroBasis()
 
-	var basisSpan []int
-	for _, qCoeffs := range c.QSpace.Vecs.Vecs {
+	qVecs := c.QSpace.Vecs.Vecs
+	coeffs := make([][]int, len(qVecs))
+	for _, qCoeffs := range qVecs {
 		image := c.QSpace.LinearCombo(basis, qCoeffs)
-		basisSpan = append(basisSpan, image)
+		coeffs[image] = qCoeffs
 	}
 
 	minTIndex := make([]int, c.QSpace.D)
 	minTranslatesCache := make(map[int][]int)
-	return Shearer{c, basis, basisSpan, minTIndex, minTranslatesCache}
+	return Shearer{c, basis, coeffs, minTIndex, minTranslatesCache}
 }
 
 // MinShear computes the minimal shear of a BitsVec, in place.
@@ -207,12 +208,8 @@ func (s Shearer) MinShear(vec BitsVec) {
 	c := s.cells
 	translates := s.minTranslates(vec)
 
-	for k := range c.QSpace.Vecs.Vecs {
-		qPt := s.basisSpan[k]
-		value := vec[qPt]
-
-		value = c.Translations.Apply(translates[k], value)
-		vec[qPt] = value
+	for i, bits := range vec {
+		vec[i] = c.Translations.Apply(translates[i], bits)
 	}
 }
 
@@ -235,13 +232,14 @@ func (s Shearer) minTranslates(vec BitsVec) []int {
 
 	// Then compute the composed translate for each QSpace coeff.
 	translates = make([]int, len(c.QSpace.Vecs.Vecs))
-	for k, qCoeffs := range c.QSpace.Vecs.Vecs {
+	for k, coeffs := range s.coeffs {
+		// Use pre-computed coeffs of the k'th point, in the nonzero basis.
 
 		trans := 0
 		for i, tIndex := range s.minTIndex {
-			if qCoeffs[i] == 1 {
+			if coeffs[i] == 1 {
 				trans = c.CSpace.Sum[trans][tIndex]
-			} else if qCoeffs[i] == 2 {
+			} else if coeffs[i] == 2 {
 				trans = c.CSpace.Sum[trans][tIndex]
 				trans = c.CSpace.Sum[trans][tIndex]
 			}
@@ -251,23 +249,4 @@ func (s Shearer) minTranslates(vec BitsVec) []int {
 
 	s.minTranslatesCache[h] = translates
 	return translates
-}
-
-// nonzeroBasis finds the smallest basis for QSpace such that
-// all partition values are nonzero.
-func (c Cells) nonzeroBasis() []int {
-	var basis []int
-	var span []int
-
-	i := 1
-	for len(basis) < c.QSpace.D {
-		for c.Counts[i] == 0 || util.Contains(span, i) {
-			i++
-		}
-
-		basis = append(basis, i)
-		span = c.QSpace.Span(basis)
-	}
-
-	return basis
 }

@@ -397,7 +397,7 @@ func (vec BitsVec) GetIndices(indices []int, out BitsVec) {
 }
 
 // PermuteValues permutes cells in a BitsVec, using an out vector.
-func (vec BitsVec) PermuteValues(qIsom []int, out BitsVec) {
+func (vec BitsVec) PermuteValues(qIsom []int, out BitsVec) BitsVec {
 	if len(vec) != len(out) {
 		panic("length mismatch")
 	}
@@ -405,6 +405,8 @@ func (vec BitsVec) PermuteValues(qIsom []int, out BitsVec) {
 	for i, bits := range vec {
 		out[qIsom[i]] = bits
 	}
+
+	return out
 }
 
 // ToPoints converts a BitsVec to pts, using a given slice.
