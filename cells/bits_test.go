@@ -133,9 +133,6 @@ func ExampleBitsVec() {
 	vec.CopyTo(out)
 	fmt.Println(out.Cmp(vec))
 
-	cells.Translations.MinImages(vec, out)
-	fmt.Println(out)
-
 	vec[1] = 1
 	fmt.Println(vec)
 	vec.PermuteValues(transpose, out)
@@ -150,7 +147,6 @@ func ExampleBitsVec() {
 	// -1
 	// 7
 	// 0
-	// [9 0 0 0 0 0 0 0 0]
 	// [72 1 0 0 0 0 0 0 0]
 	// [72 0 0 1 0 0 0 0 0]
 	// [0 0 0 0 0 0 0 0 0]

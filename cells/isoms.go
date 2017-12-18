@@ -102,17 +102,6 @@ func (p *CellPerms) MinImage(b Bits32) Bits32 {
 	return image
 }
 
-// MinImages computes the MinImage for each bits in a BitsVec, using an out vector.
-func (p *CellPerms) MinImages(vec BitsVec, out BitsVec) {
-	if len(vec) != len(out) {
-		panic("length mismatch")
-	}
-
-	for i, bits := range vec {
-		out[i] = p.MinImage(bits)
-	}
-}
-
 // We now define several classes of cell-preserving isomorphisms.
 //
 // Our goal is to represent the full class of linear isomorphisms that preserve cells (as a set).
