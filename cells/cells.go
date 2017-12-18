@@ -75,6 +75,11 @@ func New(s *space.Space, counts []int) Cells {
 	return c
 }
 
+// Len returns the number of cells.
+func (c Cells) Len() int {
+	return len(c.Cells)
+}
+
 // MinPt returns the min point in a given cell.
 func (c *Cells) MinPt(cell int) int {
 	return cell * c.CellSize
@@ -137,4 +142,9 @@ func NewProjCells(c Cells) *ProjCells {
 	}
 
 	return &ProjCells{indices, counts, sizes}
+}
+
+// Len returns the number of projective cells.
+func (p ProjCells) Len() int {
+	return len(p.Indices)
 }

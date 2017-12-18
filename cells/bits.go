@@ -306,7 +306,7 @@ func NewBitsVec(l int) BitsVec {
 
 // NewBitsVec creates a new BitsVec for a Cells.
 func (c Cells) NewBitsVec() BitsVec {
-	return NewBitsVec(len(c.Cells))
+	return NewBitsVec(c.Len())
 }
 
 // Hash a BitsVec. This is the modular hashing algorithm used by Java's hashCode(),
@@ -411,7 +411,7 @@ func (vec BitsVec) PermuteValues(qIsom []int, out BitsVec) BitsVec {
 
 // ToPoints converts a BitsVec to pts, using a given slice.
 func (vec BitsVec) ToPoints(c Cells, out []int) []int {
-	if len(vec) != len(c.Cells) {
+	if len(vec) != c.Len() {
 		panic("length mismatch")
 	}
 
