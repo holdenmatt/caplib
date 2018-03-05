@@ -32,6 +32,8 @@ type Cells struct {
 	Translations *CellPerms         // Translations of CSpace
 	CIsoms       *util.PermsProduct // CSpace isoms
 	QIsoms       *util.Perms        // QSpace isoms that preserve counts
+
+	NonzeroBasis []int // The smallest QSpace basis with nonzero partition values.
 }
 
 // New creates a new Cells in a Space with the given counts.
@@ -67,11 +69,12 @@ func New(s *space.Space, counts []int) Cells {
 		}
 	}
 
-	c := Cells{s, cells, counts, cellSize, cSpace, qSpace, nil, nil, nil, nil}
+	c := Cells{s, cells, counts, cellSize, cSpace, qSpace, nil, nil, nil, nil, nil}
 	c.ProjCells = NewProjCells(c)
 	c.Translations = c.NewCellPerms(cSpace.Translations().Perms)
 	c.CIsoms = c.GetCIsoms()
 	c.QIsoms = c.GetQIsoms()
+	c.NonzeroBasis = c.nonzeroBasis()
 	return c
 }
 
@@ -100,9 +103,8 @@ func (c *Cells) CellIndex(pt int) int {
 	return cell
 }
 
-// NonzeroBasis finds the smallest basis for QSpace such that
-// all partition values are nonzero.
-func (c *Cells) NonzeroBasis() []int {
+// nonzeroBasis finds the smallest basis for QSpace such that all partition values are nonzero.
+func (c *Cells) nonzeroBasis() []int {
 	var basis []int
 	var span []int
 
