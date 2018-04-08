@@ -103,6 +103,17 @@ func (c *Cells) CellIndex(pt int) int {
 	return cell
 }
 
+// CellCount returns the count of pts in a given cell.
+func (c *Cells) CellCount(pts []int, cell int) int {
+	count := 0
+	for _, p := range pts {
+		if c.CellIndex(p) == cell {
+			count++
+		}
+	}
+	return count
+}
+
 // nonzeroBasis finds the smallest basis for QSpace such that all partition values are nonzero.
 func (c *Cells) nonzeroBasis() []int {
 	var basis []int
