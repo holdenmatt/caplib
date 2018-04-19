@@ -309,16 +309,6 @@ func (c Cells) NewBitsVec() BitsVec {
 	return NewBitsVec(c.Len())
 }
 
-// Hash a BitsVec. This is the modular hashing algorithm used by Java's hashCode(),
-// which is very simple and fast.
-func (vec BitsVec) Hash() uint32 {
-	var hash uint32 = 1
-	for _, bits := range vec {
-		hash = 31*hash + uint32(bits)
-	}
-	return hash
-}
-
 // Apply applies a (cell) perm to each cell in a BitsVec, using an out vector.
 func (vec BitsVec) Apply(perm []int, out BitsVec) {
 	if len(vec) != len(out) {
@@ -349,17 +339,6 @@ func (vec BitsVec) Cmp(other BitsVec) int {
 		}
 	}
 	return 0
-}
-
-// CopyTo copies this vec to other.
-func (vec BitsVec) CopyTo(other BitsVec) {
-	if len(vec) != len(other) {
-		panic("length mismatch")
-	}
-
-	for i, val := range vec {
-		other[i] = val
-	}
 }
 
 // EliminatedInCell returns the pts eliminated by a BitsVec in a single cell.
