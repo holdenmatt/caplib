@@ -1,20 +1,27 @@
-package cells
+package rooted
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 
+	"github.com/holdenmatt/caplib/cells"
 	"github.com/holdenmatt/caplib/space"
 )
 
+func init() {
+	log.SetOutput(ioutil.Discard)
+}
+
 func ExampleRooted_CellCaps() {
-	cells := New(space.New(4), []int{4, 2, 2, 2, 2, 2, 2, 2, 2})
+	c := cells.New(space.New(4), []int{4, 2, 2, 2, 2, 2, 2, 2, 2})
 	rooted := Rooted{
-		Cells: cells,
+		Cells: c,
 		Root:  78,
 	}
 
-	var elim Bits32
-	var out []Bits32
+	var elim cells.Bits32
+	var out []cells.Bits32
 	fmt.Println(rooted.CellCaps(1, elim, out))
 	fmt.Println(rooted.CellCaps(2, elim, out))
 
@@ -23,14 +30,14 @@ func ExampleRooted_CellCaps() {
 	// [17 33 129 257 10 34 66 258 12 20 68 132 136 264 80 272 96 160]
 }
 
-func ExampleCells_MinRoots() {
-	c := New(space.New(4), []int{4, 2, 2, 2, 2, 2, 2, 2, 2})
+func ExampleMinRoots() {
+	c := cells.New(space.New(4), []int{4, 2, 2, 2, 2, 2, 2, 2, 2})
 
-	empty := Bits32(0)
-	caps := c.addPairs([]Bits32{empty}, 2)
+	empty := cells.Bits32(0)
+	caps := addPairs(c, []cells.Bits32{empty}, 2)
 	fmt.Println(caps)
 
-	roots := c.MinRoots()
+	roots := MinRoots(c)
 	fmt.Println(len(roots))
 	fmt.Println(roots[0].Root)
 
