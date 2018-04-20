@@ -15,10 +15,8 @@ func init() {
 
 func ExampleRooted_CellCaps() {
 	c := cells.New(space.New(4), []int{4, 2, 2, 2, 2, 2, 2, 2, 2})
-	rooted := Rooted{
-		Cells: c,
-		Root:  78,
-	}
+	root := cells.Bits32(78)
+	rooted := New(c, root)
 
 	var elim cells.Bits32
 	var out []cells.Bits32
@@ -45,4 +43,25 @@ func ExampleMinRoots() {
 	// [78 278 166 344 232 432]
 	// 1
 	// 78
+}
+
+func Example_cIsomsMinimizingRoot() {
+	c := cells.New(space.New(4), []int{4, 2, 2, 2, 2, 2, 2, 2, 2})
+	root := cells.NewBits32([]int{1, 2, 3, 6})
+	rooted := New(c, root)
+
+	cIsoms := cIsomsMinimizingRoot(rooted)
+	fmt.Println(cIsoms.Perms)
+
+	// Output:
+	// [[0 1 2 3 4 5 6 7 8] [0 2 1 3 5 4 6 8 7] [0 1 2 6 7 8 3 4 5] [0 2 1 6 8 7 3 5 4] [0 3 6 1 4 7 2 5 8] [0 3 6 2 5 8 1 4 7] [0 6 3 1 7 4 2 8 5] [0 6 3 2 8 5 1 7 4]]
+}
+
+func Example_qIsomsFixingCounts() {
+	c := cells.New(space.New(4), []int{4, 2, 2, 2, 2, 2, 2, 2, 2})
+	qIsoms := qIsomsFixingCounts(c, []int{4, 2, 2, 2, 0, 0, 2, 0, 0})
+	fmt.Println(qIsoms.Perms)
+
+	// Output:
+	// [[0 1 2 3 4 5 6 7 8] [0 1 2 6 7 8 3 4 5] [0 2 1 3 5 4 6 8 7] [0 2 1 6 8 7 3 5 4] [0 3 6 1 4 7 2 5 8] [0 3 6 2 5 8 1 4 7] [0 6 3 1 7 4 2 8 5] [0 6 3 2 8 5 1 7 4]]
 }

@@ -10,7 +10,15 @@ import (
 // We generate caps in a single cell compatible with the root.
 type Rooted struct {
 	cells.Cells
-	Root cells.Bits32
+	Root  cells.Bits32
+	Isoms *Isoms
+}
+
+// New creates a new Rooted, including computing its isomorphisms
+func New(c cells.Cells, root cells.Bits32) Rooted {
+	rooted := Rooted{c, root, nil}
+	rooted.Isoms = newIsoms(rooted)
+	return rooted
 }
 
 // CellCaps returns all caps of given size in a single cell (CSpace) that
@@ -60,7 +68,7 @@ func MinRoots(c cells.Cells) []Rooted {
 	var res []Rooted
 	for _, root := range caps {
 		if isMinRoot(c, root) {
-			rooted := Rooted{c, root}
+			rooted := New(c, root)
 			res = append(res, rooted)
 		}
 	}
