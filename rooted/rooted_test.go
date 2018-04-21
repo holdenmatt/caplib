@@ -18,14 +18,25 @@ func ExampleRooted_CellCaps() {
 	root := cells.Bits32(78)
 	rooted := New(c, root)
 
-	var elim cells.Bits32
 	var out []cells.Bits32
-	fmt.Println(rooted.CellCaps(1, elim, out))
-	fmt.Println(rooted.CellCaps(2, elim, out))
+
+	vec := cells.BitsVec{78, 0, 0, 0, 0, 0, 0, 0, 0}
+	fmt.Println(rooted.CellCaps(vec, 1, out))
+
+	vec = cells.BitsVec{78, 17, 257, 0, 0, 0, 0, 0, 0}
+	fmt.Println(rooted.CellCaps(vec, 3, out))
+
+	vec = cells.BitsVec{78, 17, 257, 17, 0, 0, 257, 0, 0}
+	fmt.Println(rooted.CellCaps(vec, 4, out))
+
+	vec = cells.BitsVec{78, 17, 257, 17, 68, 0, 257, 0, 10}
+	fmt.Println(rooted.CellCaps(vec, 5, out))
 
 	// Output:
-	// [1 2 4 8 16 32 64 128 256]
 	// [17 33 129 257 10 34 66 258 12 20 68 132 136 264 80 272 96 160]
+	// [17 33 129 257 10 34 66 258 12 20 68 132 136 264 80 272 96 160]
+	// [10 34 66 12 68 132 136 96 160]
+	// [160]
 }
 
 func ExampleMinRoots() {

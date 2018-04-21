@@ -21,9 +21,18 @@ func New(c cells.Cells, root cells.Bits32) Rooted {
 	return rooted
 }
 
-// CellCaps returns all caps of given size in a single cell (CSpace) that
-// a) avoid some eliminated bits, and b) are compatible with the root.
-func (r *Rooted) CellCaps(size int, elim cells.Bits32, out []cells.Bits32) []cells.Bits32 {
+// CellCaps returns all caps for a given cell that are valid extensions of a BitsVec.
+func (r *Rooted) CellCaps(vec cells.BitsVec, cell int, out []cells.Bits32) []cells.Bits32 {
+	if !(cell > 0) {
+		panic("cell must be non-origin")
+	}
+	if vec[cell] != 0 {
+		panic("cell is non-empty")
+	}
+
+	size := r.Counts[cell]
+	elim := vec.EliminatedInCell(r.Cells, cell)
+
 	var empty cells.Bits32
 	return r.extendBits(empty, size, elim, out)
 }

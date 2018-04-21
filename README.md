@@ -22,15 +22,11 @@ Define a ternary vector space, subsets of points, and isomorphism classes.
         Define several isomorphism classes in a space: Translations,
         CoordPerms, CoordReflections, LinearIsoms.
 
-    planes.go:
-        Represent all planes in a space through the origin, and efficiently compute counts
-        of intersections for a Points.
-
 
 ## Package cells
 
-Overlay a "cell" structure on a ternary space. This is one of the primary ways we tame the highly exponential nature of the cap search problem, since it allows us to exploit
-symmetries and constrain a search to caps with defined cell counts.
+Overlay a "cell" structure on a ternary space. This is one of the primary ways we constrain the highly exponential nature of the cap search problem, since it allows us to exploit
+symmetries and confine our search to caps with defined cell counts.
 
     cells.go:
         Define Cells (a partition of a Space into translation cosets, with counts) and ProjCells
