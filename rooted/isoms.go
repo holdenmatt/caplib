@@ -12,9 +12,10 @@ import (
 // We restrict to only 1) CIsoms that minimize the root, and 2) QIsoms that preserve
 // counts (precomputed for each depth of the search tree).
 type Isoms struct {
-	CIsoms *cells.CellPerms // CIsoms that minimize the root.
-	QIsoms []util.Perms     // QIsoms that preserve counts, for each depth.
-	QBases [][][]int        // For each qIsom, pre-compute the basis that gets mapped to the std basis.
+	CIsoms   *cells.CellPerms // CIsoms that minimize the root.
+	QIsoms   []util.Perms     // QIsoms that preserve counts, for each depth.
+	QBases   [][][]int        // For each qIsom, pre-compute the basis that gets mapped to the std basis.
+	QNzBases [][][]int        // For each qIsom, pre-compute the basis that gets mapped to the nonzero basis.
 }
 
 // newIsoms creates a new Isoms for a Rooted cell space.
@@ -34,16 +35,18 @@ func newIsoms(rooted Rooted) *Isoms {
 	}
 
 	qBases := make([][][]int, len(qIsoms))
+	qNzBases := make([][][]int, len(qIsoms))
 	for depth, qIs := range qIsoms {
 		qBases[depth] = make([][]int, len(qIs.Perms))
+		qNzBases[depth] = make([][]int, len(qIs.Perms))
 		for i, qIsom := range qIs.Perms {
 			qInv := util.InversePerm(qIsom)
-			qBasis := util.GetIndices(qInv, c.QSpace.StdBasis)
-			qBases[depth][i] = qBasis
+			qBases[depth][i] = util.GetIndices(qInv, c.QSpace.StdBasis)
+			qNzBases[depth][i] = util.GetIndices(qInv, c.NonzeroBasis)
 		}
 	}
 
-	return &Isoms{cIsoms, qIsoms, qBases}
+	return &Isoms{cIsoms, qIsoms, qBases, qNzBases}
 }
 
 // cIsomsMinimizingRoot returns the subset of CIsoms that minimize the root.
